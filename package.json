@@ -23,5 +23,10 @@
   "bugs": {
     "url": "https://github.com/supershabam/mnpm/issues"
   },
-  "homepage": "https://github.com/supershabam/mnpm"
+  "homepage": "https://github.com/supershabam/mnpm",
+  "dependencies": {
+    "rsvp": "~3.0.3",
+    "knox": "~0.8.9",
+    "semver": "~2.2.1"
+  }
 }
