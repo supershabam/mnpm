@@ -11,7 +11,7 @@ The most important function of npm is `npm install` and it's having troubles wit
 
 `npm install` has the job of fetching tarballs from npm and unpacking them into `node_modules` recursively.
 
-`mnpm` is a command to run `npm install` using mirrors instead of npm. Npm isn't used at all. This is because the `mnpm` client is doing more work.
+`mnpm` is a command to run `npm install` using mirrors instead of npm. Npm isn't used at all.
 
 A mirror provides an interface for clients to get a directory listing of a specific module in order to see all available versions of that module, and a link to the tarball of that module at that version.
 
