@@ -5,13 +5,13 @@ mirrored npm
 
 ## why
 
-The most important function of npm is `npm install` and it's having troubles with uptime and scaling. This is a prototype to implement the functionality of `npm install` through the idea of mirrors.
+The most important function of npm is `npm install` and it's having troubles with uptime and scaling. This is a prototype to implement the functionality of `npm install` through the idea of cheap, easily-replicated http mirrors.
 
 ## how
 
 `npm install` has the job of fetching tarballs from npm and unpacking them into `node_modules` recursively.
 
-`mnpm` is a command to run `npm install` using mirrors instead of npm. Npm isn't used at all.
+`mnpm` is a command to run `npm install` using mirrors instead of npm. In fact, npm isn't needed at all to complete the install. The mirrors will need to stay in-sync with the packages available in npm, but that is a separate process. One seed mirror can tail npm for updates, pull the tarball and insert it into the mirror. Replicated mirrors can rsync off the seed mirror to stay up-to-date.
 
 A mirror provides an interface for clients to get a directory listing of a specific module in order to see all available versions of that module, and a link to the tarball of that module at that version.
 
@@ -22,23 +22,3 @@ Second, in order to resolve the semver expression, the mnpm client fetches a lis
 Third, knowing the exact version of a module, the mnpm client downloads the tarball from the mirror. For now, the contents of the tarball is simply trusted, but in a real implementation the mnpm client could compute a checksum of the tarball and verify it against an authoritative list of checksums.
 
 Fourth, expand the tarball into the correct node_modules directory path, perform any install execution steps, and then recursively call install on the subpackage using its package.json file.
-
-## usage
-
-From that api (get versions, get tarball) we can implement `npm install`.
-
-Here's some pseudocode. From the root node, install each of the dependencies at the version most appropriate to what package.json specifies, then repeate for each newly installed dependency.
-
-```javascript
-function install(package) {
-  package.dependencies.forEach(function(dependency) {
-    var versions = api.versions(dependency)
-    var version = resolve(dependency, versions)
-    var tarball = api.tarball(dependency, version)
-    unpack(tarball)
-    if (unpacked.hasPackage) {
-      install(unpacked.package)
-    }
-  })
-}
-```
