@@ -10,8 +10,6 @@ var zlib = require('zlib')
 // ideally, use http endpoint, but s3 is too easy to set up and doing dir listings
 // isn't standardized on http
 var s3 = knox.createClient({
-  key: 'AKIAID6QZA2RO7R234QQ',
-  secret: '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',
   bucket: 'mnpm',
   region: 'us-west-2'
 })
