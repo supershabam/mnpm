@@ -1,7 +1,10 @@
 var fs = require('fs')
 var knox = require('knox')
+var path = require('path')
 var RSVP = require('rsvp')
 var semver = require('semver')
+var tar = require('tar')
+var zlib = require('zlib')
 
 // mnpm user credentials (only has access to list/read mnpm bucket)
 // ideally, use http endpoint, but s3 is too easy to set up and doing dir listings
@@ -17,16 +20,13 @@ var Promise = RSVP.Promise
 
 function install(pkg) {
   pkg.then(function(pkg) {
-    console.log(pkg)
   })
 }
 
 function dependencies(pkg) {
-  var hash = pkg.dependencies || {}
-  var unresolved = Object.keys(hash).forEach(function(module) {
-    return [module, hash[module]]
+  return Object.keys(pkg.dependencies || {}).map(function(module) {
+    return {module: module, range: pkg.dependencies[module]}
   })
-
 }
 
 function resolve(module, range) {
@@ -55,19 +55,23 @@ function versions(module) {
   })
 }
 
-rootPkg = new Promise(function(resolve, reject) {
-  fs.readFile('package.json', function(err, data) {
-    if (err) {
-      return reject(err)
-    }
-    try {
-      resolve(JSON.parse(data))
-    } catch (err) {
-      reject(err)
-    }
+function extract(module, version, dest) {
+  return new Promise(function(resolve, reject) {
+    s3.get(module + '/' + module + '-v' + version + '.tgz').on('response', function(res) {
+      if (res.statusCode !== 200) {
+        return reject(new Error('bad status code while getting tarball: ' + res.statusCode))
+      }
+      res
+        .pipe(zlib.createGunzip())
+        .pipe(tar.Extract({path: dest}))
+        .on('error', reject)
+        .on('end', resolve)
+    }).end()
   })
-})
+}
 
-resolve('mnpm', '0.x').then(function(version) {
-  console.log(version)
-})
+console.log(dependencies({
+  dependencies: {
+    test: '0.4.2'
+  }
+}))
