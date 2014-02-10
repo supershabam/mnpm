@@ -18,8 +18,31 @@ var s3 = knox.createClient({
 
 var Promise = RSVP.Promise
 
-function install(pkg) {
-  pkg.then(function(pkg) {
+function install(file) {
+  return read(file).then(function(pkg) {
+    return Promise.all(dependencies(pkg).map(function(dependency) {
+      return version(dependency.module, dependency.range).then(function(version) {
+        if (version === null) {
+          throw new Error('unable to satisfy dependency: ' + dependency.module + '@' + dependency.range)
+        }
+        return version
+      })
+    }))
+  })
+}
+
+function read(file) {
+  return new Promise(function(resolve, reject) {
+    fs.readFile(file, function(err, data) {
+      if (err) {
+        return reject(err)
+      }
+      try {
+        resolve(JSON.parse(data))
+      } catch (err) {
+        reject(err)
+      }
+    })
   })
 }
 
@@ -29,7 +52,7 @@ function dependencies(pkg) {
   })
 }
 
-function resolve(module, range) {
+function version(module, range) {
   return versions(module).then(function(versions) {
     return semver.maxSatisfying(versions, range)
   })
@@ -70,8 +93,5 @@ function extract(module, version, dest) {
   })
 }
 
-console.log(dependencies({
-  dependencies: {
-    test: '0.4.2'
-  }
-}))
+install(path.resolve('./package.json')).then(console.log, console.error)
+
