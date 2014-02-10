@@ -1,0 +1,32 @@
+{
+  "name": "mnpm",
+  "version": "0.0.0",
+  "description": "mirrored node packaged modules",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/supershabam/mnpm"
+  },
+  "keywords": [
+    "npm",
+    "package",
+    "manager",
+    "as",
+    "ya",
+    "do"
+  ],
+  "author": "ian@supershabam.com",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/supershabam/mnpm/issues"
+  },
+  "homepage": "https://github.com/supershabam/mnpm",
+  "dependencies": {
+    "rsvp": "~3.0.3",
+    "knox": "~0.8.9",
+    "semver": "~2.2.1"
+  }
+}
